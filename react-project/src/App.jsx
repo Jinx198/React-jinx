@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useReducer } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
@@ -8,7 +8,7 @@ import chef from  "./images/chef.jpg"
 function Header({name, year}){
   return(
     <header>
-      <h1>{name}'s ui</h1>
+      <h1>{name}'s Restaurant</h1>
       <p>Copyright {year}</p>
     </header>
   );
@@ -25,12 +25,17 @@ const dishObjects= items.map((dish,i) => ({
   title: dish
 }));
 
-function Main({dishes, openStatus}) {
+function Main({dishes, openStatus, onStatus}) {
   return(
     <>
     <div>
-      <h2>Welcome to this beautiful Restaurant! {" "} 
-        {openStatus ? "Open" :"Closed"}</h2>
+      <button onClick={()=> onStatus(true)}>
+        I want to be open
+        </button>
+      <h2>
+        Welcome to this beautiful Restaurant! {" "} 
+        {openStatus ? "Open" :"Closed"}
+        </h2>
     </div>
 
     <main>
@@ -50,25 +55,32 @@ function Main({dishes, openStatus}) {
 }
 
 function App() {
-  const [status,setStatus]=useState(true);
-  console.log(status);
+  const[status, toggle]= useReducer(
+    (status) => !status,
+    true);
+
+    useEffect(()=> {
+      console.log(
+        `The restaurant is ${status ? "open" : "closed"}.`
+      );
+    }, [status]);
 
   return (
   <div>
-    <h1>The restaurant is currently {" "} 
+    <h1>
+      The restaurant is currently {" "} 
       {status ? "Open" : "Closed"}.
     </h1>
-    <button onClick ={()=> setStatus(!status)}>
+    <button onClick ={toggle}>
       {status ? "Close" : "Open"} Restaurant
-
     </button>
-    <Header name ="Jinx" 
-    year={new Date().getFullYear()} />
-    <Main dishes={dishObjects} 
-    openStatus={status} />
-  <main>
-    <h2>Welcome to my react page</h2>
-  </main>
+
+    <Header name ="Jinx" year={new Date().getFullYear()} />
+    <Main 
+    dishes={dishObjects} 
+    openStatus={status} 
+    onStatus={toggle} />
+
   </div>
   );
 }
